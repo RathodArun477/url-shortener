@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, redirect, render_template
 from urllib.parse import urlparse
+import os
 from utils import generate_code,normalize_url
 from db import insert_db, init_db, get_original_url, get_url_stats
 MAX_ATTEMPTS = 5
@@ -27,7 +28,11 @@ def shorten():
         code = generate_code()
 
         if insert_db(code,url):
-            short_url = request.host_url + code
+            base_url = os.environ.get(
+                "PUBLIC_BASE_URL",
+                request.host_url.rstrip("/")
+            )
+            short_url = f"{base_url}/{code}"
 
             return jsonify({
                 "message":"url shortened successfully",
