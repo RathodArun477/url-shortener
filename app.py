@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, redirect, render_template
 from urllib.parse import urlparse
-from utils import generate_code
+from utils import generate_code,normalize_url
 from db import insert_db, init_db, get_original_url, get_url_stats
 MAX_ATTEMPTS = 5
 app = Flask(__name__)
@@ -22,11 +22,7 @@ def shorten():
     if not isinstance(url,str) or not url.strip():
         return jsonify({"message":"incorrect url received"}),400
     url = url.strip()
-    parsed = urlparse(url)
-    if not parsed.scheme:
-        url = "https://" + url
-    elif parsed.scheme not in ("http","https"):
-        return jsonify({"message":"invalid url scheme"}),400
+    url = normalize_url()
     for attempt in range(MAX_ATTEMPTS):
         code = generate_code()
 
