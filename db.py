@@ -1,8 +1,11 @@
 import sqlite3
+import os
+from pathlib import Path
 
-DATABASE = "urls.db"
+DATABASE = Path(os.environ.get("DATABASE_PATH", "urls.db"))
+DATABASE.parent.mkdir(parents=True, exist_ok=True)
 def get_connection():
-    con = sqlite3.connect(DATABASE)
+    con = sqlite3.connect(str(DATABASE))
     con.row_factory = sqlite3.Row
     return con
 
