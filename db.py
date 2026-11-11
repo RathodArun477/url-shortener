@@ -24,9 +24,15 @@ def insert_db(code,original):
     con = get_connection()
     cur = con.cursor()
 
-    cur.execute("""INSERT INTO urls (code,original_url) VALUES(?,?)""",(code,original))
-    con.commit()
-    con.close()
+    try:
+        cur.execute("""INSERT INTO urls (code,original_url) VALUES(?,?)""",(code,original))
+
+        con.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        con.close()
 
 
 def get_original_url(code):
