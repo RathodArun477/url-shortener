@@ -1,7 +1,7 @@
-from flask import Flask,request,jsonify
+from flask import Flask,request,jsonify,redirect
 # from markupsafe import escape
 from utils import generate_code
-from db import insert_db,init_db
+from db import insert_db,init_db,get_original_url
 MAX_ATTEMPTS = 5
 app = Flask(__name__)
 init_db()
@@ -30,7 +30,18 @@ def shorten():
 
             return jsonify({
                 "message":"url shortened successfully",
+                "code":code,
                 "short_url":short_url
             }),201
 
     return jsonify({"message":"could not generate a unique code, please try again"}),500
+
+
+@app.route('/<code>',methods=['GET'])
+def redirect_url(code):
+    original = get_original_url(code)
+
+    if not original:
+        return jsonify({"message":"no url found, please try again"}),404
+
+    return redirect(original)
